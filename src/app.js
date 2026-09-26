@@ -1,11 +1,15 @@
+require("dotenv").config();
+
 const express = require("express")
 const app = express()
 const { connectDB } = require("./config/database")
 const User = require("./models/user")
-const { signUpValidation, loginValidation } = require("./utils/validation")
+const { signUpValidation, loginValidation, loginController } = require("./utils/validation")
 const bcrypt = require("bcrypt")
+const jwt = require('jsonwebtoken')
+const cookieParser = require("cookie-parser")
 app.use(express.json())
-
+app.use(cookieParser())
 
 
 
@@ -36,30 +40,26 @@ app.post('/signup', async (req, res) => {
   }
 })
 
-app.post("/login", async (req, res) => {
-  const { emailId, password } = req.body;
+app.post("/login", loginValidation, loginController)
+
+app.get("/profile", async (req, res) => {
   try {
-    loginValidation(req)
-
-    const existingUser = await User.findOne({ emailId })
-    if (!existingUser) {
-      return res.status(404).send({
-        message: "User not found"
-      });
+    const cookies = req.cookies
+    const { token } = cookies
+    if (!token) {
+      res.status(400).send("Token is invalid")
     }
-    const isPasswordValid = await bcrypt.compare(password, existingUser.password)
-    if (!isPasswordValid) {
-      return res.status(401).send({
-        message: "Invalid email or password"
-      });
-    }
-
+    const decodeToken = await jwt.verify(token, "secrateKey")
+    console.log(decodeToken)
+    const { id } = decodeToken
+    const userProfile = await User.findById({ _id: id })
     res.send({
-      message: "Login is successful"
+      message: "User Profile fetched",
+      data: userProfile
     })
   } catch (error) {
     res.status(400).send({
-      message: "Login failed",
+      message: "Error fetching the data",
       error: error.message
     });
   }
