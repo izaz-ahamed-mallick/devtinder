@@ -4,58 +4,28 @@ const express = require("express")
 const app = express()
 const { connectDB } = require("./config/database")
 const User = require("./models/user")
-const { signUpValidation, loginValidation, loginController } = require("./utils/validation")
-const bcrypt = require("bcrypt")
-const jwt = require('jsonwebtoken')
-const cookieParser = require("cookie-parser")
+const { signUpValidation, loginValidation } = require("./utils/validation")
+
+const cookieParser = require("cookie-parser");
+const { userAuth } = require("./middleware/auth");
+
+const { loginController, signUpController } = require("./controller/auth.controller")
 app.use(express.json())
 app.use(cookieParser())
 
 
 
-app.post('/signup', async (req, res) => {
-
-  try {
-    //data validation
-    const { firstName, lastName, emailId, password } = req.body
-    signUpValidation(req)
-    //encryption
-    const passwordHash = await bcrypt.hash(password, 10)
-    const user = new User(
-      {
-        firstName, lastName, emailId, password: passwordHash
-      }
-    )
-    const resp = await user.save()
-    const { password: _, ...userData } = resp.toObject();
-    res.status(201).send({
-      message: "Data added successfully",
-      data: userData
-    });
-  } catch (err) {
-    res.status(400).send({
-      message: "Error while saving the data",
-      error: err.message
-    })
-  }
-})
+app.post('/signup', signUpValidation, signUpController)
 
 app.post("/login", loginValidation, loginController)
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const cookies = req.cookies
-    const { token } = cookies
-    if (!token) {
-      res.status(400).send("Token is invalid")
-    }
-    const decodeToken = await jwt.verify(token, "secrateKey")
-    console.log(decodeToken)
-    const { id } = decodeToken
-    const userProfile = await User.findById({ _id: id })
+    const user = req.user
+    const { password, ...userData } = user.toObject()
     res.send({
       message: "User Profile fetched",
-      data: userProfile
+      data: userData
     })
   } catch (error) {
     res.status(400).send({
@@ -143,7 +113,7 @@ app.patch('/updateUser/:userId', async (req, res) => {
 connectDB().then((connection) => {
   console.log("Database connection is established...");
 
-  app.listen(3000, () => {
+  app.listen(3001, () => {
     console.log("Server start successfully!");
   });
 }).catch((err) => {
