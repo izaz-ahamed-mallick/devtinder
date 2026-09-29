@@ -40,7 +40,7 @@ const loginService = async (emailId, password) => {
   if (!existingUser) {
     throw new Error("User Not found");
   }
-  const isPasswordValid = await bcrypt.compare(password, existingUser.password)
+  const isPasswordValid = await existingUser.validatiorPassword(password)
   if (!isPasswordValid) {
     throw new Error("Password is not valid");
   }
@@ -48,4 +48,4 @@ const loginService = async (emailId, password) => {
 
 }
 
-module.exports = { signUpValidation, loginValidation ,loginService}
+module.exports = { signUpValidation, loginValidation, loginService }

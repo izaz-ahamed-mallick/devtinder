@@ -22,10 +22,9 @@ app.post("/login", loginValidation, loginController)
 app.get("/profile", userAuth, async (req, res) => {
   try {
     const user = req.user
-    const { password, ...userData } = user.toObject()
     res.send({
       message: "User Profile fetched",
-      data: userData
+      data: user
     })
   } catch (error) {
     res.status(400).send({

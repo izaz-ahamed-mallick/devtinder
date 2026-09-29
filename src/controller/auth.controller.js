@@ -41,8 +41,7 @@ const loginController = async (req, res) => {
   try {
     const user = await loginService(emailId, password)
 
-    const { _id } = user
-    const token = await jwt.sign({ id: _id }, process.env.JWT_SECRET)
+    const token = await user.getJWT()
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
