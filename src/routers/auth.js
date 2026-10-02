@@ -7,4 +7,11 @@ authRouter.post('/signup', signUpValidation, signUpController)
 
 authRouter.post("/login", loginValidation, loginController)
 
+authRouter.post("/logout", async (req, res) => {
+  res.clearCookie("token");
+
+  res.send({
+    message: "Logout successful"
+  });
+});
 module.exports = authRouter
