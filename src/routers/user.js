@@ -1,5 +1,7 @@
 const express = require("express");
 const User = require("../models/user");
+const { userAuth } = require("../middleware/auth");
+const ConnectionRequest = require("../models/connectionRequest");
 const userRouter = express.Router();
 
 
@@ -13,7 +15,7 @@ userRouter.get("/getUserByEmail", async (req, res) => {
     }
     res.send(data)
   } catch (error) {
-    res.status(400).send("Something went wrong!")
+    res.status(400).send("Somethi ng went wrong!")
   }
 })
 
@@ -35,8 +37,6 @@ userRouter.delete("/deleteUser", async (req, res) => {
 
   try {
     const userId = req.body?.userId;
-
-    console.log("userId:", userId);
 
     const resp = await User.findByIdAndDelete(userId);
 
@@ -68,6 +68,56 @@ userRouter.patch('/updateUser/:userId', async (req, res) => {
     res.send({
       message: "User update successfully",
       data: resp
+    })
+  } catch (error) {
+    res.status(500).send({
+      message: "Something went wrong",
+      error: error.message
+    })
+  }
+})
+
+
+userRouter.get("/user/request/getAllPendingRequest", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user._id;
+    const data = await ConnectionRequest.find({
+      toUserId: loggedInUser,
+      status: "interested"
+    }).populate("fromUserId", ["firstName", "lastName", "gender", "skills"])
+
+    res.json({
+      messaage: "All pending connection request fetch successfully",
+      data
+    })
+  } catch (error) {
+    res.status(500).send({
+      message: "Something went wrong",
+      error: error.message
+    })
+  }
+})
+
+userRouter.get("/user/request/acceptedConnection", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user._id;
+
+    const data = await ConnectionRequest.find({
+      $or: [
+        { toUserId: loggedInUser, status: "accepted" },
+        { fromUserId: loggedInUser, status: "accepted" }
+      ],
+
+    }).populate("fromUserId", ["firstName", "lastName", "gender", "skills"])
+      .populate("toUserId", ["firstName", "lastName", "gender", "skills"]);
+
+    const connection = data.map((user) => {
+      return user.fromUserId._id.equals(loggedInUser) ? user.toUserId : user.fromUserId;
+    })
+    res.json({
+      messaage: "All accepted connection request fetch successfully",
+      connection,
+      loggedInUser
     })
   } catch (error) {
     res.status(500).send({

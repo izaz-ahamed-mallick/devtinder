@@ -1,5 +1,5 @@
 
-const connectionRequest = require("../models/connectionRequesr");
+const connectionRequest = require("../models/connectionRequest");
 const User = require("../models/user")
 const mongoose = require("mongoose")
 
@@ -49,4 +49,21 @@ const requetValidation = async (req, res, next) => {
   }
 }
 
-module.exports = requetValidation
+
+const connectionRequestValidation = async(req, res, next) => {
+
+ try {
+     const { status} = req.params;
+    const ALLOWED_STATUS = ["accepted", "rejected"]
+    if (!ALLOWED_STATUS.includes(status)) {
+      throw new Error("Status is not accepted")
+    }
+    next()
+ } catch (error) {
+  res.status(400).json({
+    message : error.message
+  })
+ }
+}
+
+module.exports = {requetValidation,connectionRequestValidation}

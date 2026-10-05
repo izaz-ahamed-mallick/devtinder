@@ -13,7 +13,6 @@ const userSchema = new mongoose.Schema({
   lastName: {
     type: String,
     maxLength: 50,
-    minLength: 4
   },
   emailId: {
     type: String,
@@ -50,6 +49,9 @@ const userSchema = new mongoose.Schema({
   },
   skills: {
     type: [String]
+  },
+  photoUrl:{
+    type:String
   }
 
 }, { timestamps: true })

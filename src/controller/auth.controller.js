@@ -8,7 +8,7 @@ const signUpController = async (req, res) => {
 
   try {
     //data validation
-    const { firstName, lastName, emailId, password } = req.body
+    const { firstName, lastName, emailId,gender,skills, password } = req.body
     const existingUser = await User.findOne({ emailId })
     if (existingUser) {
       return res.status(409).json({
@@ -19,7 +19,7 @@ const signUpController = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10)
     const user = new User(
       {
-        firstName, lastName, emailId, password: passwordHash
+        firstName, lastName, emailId,gender,skills, password: passwordHash
       }
     )
     const resp = await user.save()
@@ -31,7 +31,7 @@ const signUpController = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       message: "Signup failed",
-      error: error.message
+      error: err.message
     });
   }
 }
