@@ -117,8 +117,43 @@ userRouter.get("/user/request/acceptedConnection", userAuth, async (req, res) =>
     res.json({
       messaage: "All accepted connection request fetch successfully",
       connection,
-      loggedInUser
     })
+  } catch (error) {
+    res.status(500).send({
+      message: "Something went wrong",
+      error: error.message
+    })
+  }
+})
+
+userRouter.get("/user/feed", userAuth, async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = Math.min(Number(req.query.limit) || 10, 50);
+    const skip = (page - 1) * limit
+    console.log(page, limit, skip)
+    const loggedInUser = req.user._id;
+    const connection = await ConnectionRequest.find({
+      $or: [
+        { fromUserId: loggedInUser },
+        { toUserId: loggedInUser }
+      ]
+    }).select("fromUserId toUserId")
+    const hideUser = new Set()
+    connection.forEach((req) => {
+      hideUser.add(req.fromUserId.toString())
+      hideUser.add(req.toUserId.toString())
+    })
+    const profileFeed = await User.find({
+      _id: { $nin: Array.from(hideUser) }
+    }).select("firstName lastName gender age about skills photoUrl")
+      .skip(skip)
+      .limit(limit)
+
+    return res.status(200).json({
+      message: "Profile feed fetched successfully",
+      data: profileFeed
+    });
   } catch (error) {
     res.status(500).send({
       message: "Something went wrong",
