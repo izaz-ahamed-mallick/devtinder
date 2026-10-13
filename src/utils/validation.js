@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt")
 
 const signUpValidation = (req, res, next) => {
   try {
-    const { firstName, lastName, emailId, password } = req.body;
+    const { firstName, lastName, emailId, password,age } = req.body;
 
     if (!firstName || !lastName) {
       throw new Error("First Name or Last Name is needed")
@@ -16,6 +16,8 @@ const signUpValidation = (req, res, next) => {
     }
     else if (!validator.isStrongPassword(password)) {
       throw new Error("Password is not strong!")
+    }else if (!age){
+        throw new Error("age is required")
     }
     next()
   } catch (error) {

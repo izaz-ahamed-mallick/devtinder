@@ -50,8 +50,20 @@ const userSchema = new mongoose.Schema({
   skills: {
     type: [String]
   },
-  photoUrl:{
-    type:String
+  githubUrl: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+
+  linkedinUrl: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+
+  photoUrl: {
+    type: String
   }
 
 }, { timestamps: true })

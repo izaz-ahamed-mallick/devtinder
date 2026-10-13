@@ -8,7 +8,7 @@ const signUpController = async (req, res) => {
 
   try {
     //data validation
-    const { firstName, lastName, emailId,gender,skills, password } = req.body
+    const { firstName, lastName, emailId, gender, skills,age, password,githubUrl,linkedinUrl,photoUrl } = req.body
     const existingUser = await User.findOne({ emailId })
     if (existingUser) {
       return res.status(409).json({
@@ -19,7 +19,7 @@ const signUpController = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10)
     const user = new User(
       {
-        firstName, lastName, emailId,gender,skills, password: passwordHash
+        firstName, lastName, emailId, gender, skills,age ,password: passwordHash,githubUrl,linkedinUrl
       }
     )
     const resp = await user.save()
@@ -44,18 +44,18 @@ const loginController = async (req, res) => {
     const token = await user.getJWT()
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "lax"
-    }
-    )
-    res.json({
-      message: "Login successful"
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
     });
+    
+res.json({
+  message: "Login successful"
+});
   } catch (error) {
-    res.status(400).json({
-      message: error.message
-    });
-  }
+  res.status(400).json({
+    message: error.message
+  });
+}
 }
 
 

@@ -10,9 +10,9 @@ const { updatePasswordValidation, validationProfileEdit } = require("../utils/pr
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
     const user = req.user
-    res.send({
+    res.json({
       message: "User Profile fetched",
-      data: user
+      user
     })
   } catch (error) {
     res.status(400).send({
