@@ -18,7 +18,7 @@ const connectionRequestSchema = new mongoose.Schema({
       message: props => `${props.value} is not a valid status`
     }
   }
-})
+},{timestamps:true})
 
 connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 })
 

@@ -39,22 +39,22 @@ requestRouter.patch("/connectionRequest/:status/:requestId", userAuth, connectio
       status: "interested"
     })
     if (!isValidRequest) {
-     return res.status(400).json({
+      return res.status(400).json({
         message: "This connection request is not valid"
       })
     }
     isValidRequest.status = status;
     const data = await isValidRequest.save()
     return res.status(201).json({
-      message: "Connection request is update successfully",
+      message: `Connection request is ${status} successfully`,
       data: data
     })
   } catch (error) {
-  res.status(400).json({
-  message:"Error while update connection request",
-  error:error.message
-  
-})
+    res.status(400).json({
+      message: "Error while update connection request",
+      error: error.message
+
+    })
   }
 })
 

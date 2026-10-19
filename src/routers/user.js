@@ -3,7 +3,8 @@ const User = require("../models/user");
 const { userAuth } = require("../middleware/auth");
 const ConnectionRequest = require("../models/connectionRequest");
 const userRouter = express.Router();
-
+const sendResponse = require("../utils/sendResponse.js")
+const sendError = require("../utils/sendError.js")
 
 
 userRouter.get("/getUserByEmail", async (req, res) => {
@@ -52,57 +53,58 @@ userRouter.delete("/deleteUser", async (req, res) => {
   }
 })
 
-userRouter.patch('/updateUser/:userId', async (req, res) => {
-  try {
-    const userId = req.params.userId
-    const updateData = req.body
-    const ALLOWED_UPDATE = ["firstName", "lastName", "age", "gender", "about", "skills"]
-    const invalidKeys = Object.keys(updateData).filter(key => !ALLOWED_UPDATE.includes(key))
-    if (invalidKeys.length > 0) {
-      throw new Error(`These fields cannot be updated: ${invalidKeys.join(", ")}`);
+
+userRouter.get(
+  "/user/request/getAllRequest",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user._id;
+
+      const requests = await ConnectionRequest.find({
+        toUserId: loggedInUser,
+        status: "interested",
+      }).populate("fromUserId", [
+        "firstName",
+        "lastName",
+        "gender",
+        "skills",
+        "about",
+        "photoUrl",
+        "age",
+        "location",
+        "linkedinUrl",
+      ]);
+      const data = requests.map((request) => ({
+        requestId: request._id,
+        status: request.status,
+        createdAt: request.createdAt || request.updatedAt || "",
+        user: request.fromUserId,
+      }));
+      return sendResponse(
+        res,
+        200,
+        "Connection requests fetched successfully",
+        data
+      );
+    } catch (error) {
+      console.error("Error fetching connection requests:", error);
+
+      return sendError(
+        res,
+        500,
+        "Something went wrong while fetching connection requests"
+      );
     }
-    const resp = await User.findByIdAndUpdate(userId, updateData, { returnDocument: "after" })
-    if (!resp) {
-      return res.status(400).send("user not found")
-    }
-    res.send({
-      message: "User update successfully",
-      data: resp
-    })
-  } catch (error) {
-    res.status(500).send({
-      message: "Something went wrong",
-      error: error.message
-    })
   }
-})
+);
 
-
-userRouter.get("/user/request/getAllPendingRequest", userAuth, async (req, res) => {
-  try {
-    const loggedInUser = req.user._id;
-    const data = await ConnectionRequest.find({
-      toUserId: loggedInUser,
-      status: "interested"
-    }).populate("fromUserId", ["firstName", "lastName", "gender", "skills"])
-
-    res.json({
-      messaage: "All pending connection request fetch successfully",
-      data
-    })
-  } catch (error) {
-    res.status(500).send({
-      message: "Something went wrong",
-      error: error.message
-    })
-  }
-})
 
 userRouter.get("/user/request/acceptedConnection", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user._id;
 
-    const data = await ConnectionRequest.find({
+    const connection = await ConnectionRequest.find({
       $or: [
         { toUserId: loggedInUser, status: "accepted" },
         { fromUserId: loggedInUser, status: "accepted" }
@@ -111,18 +113,53 @@ userRouter.get("/user/request/acceptedConnection", userAuth, async (req, res) =>
     }).populate("fromUserId", ["firstName", "lastName", "gender", "skills"])
       .populate("toUserId", ["firstName", "lastName", "gender", "skills"]);
 
-    const connection = data.map((user) => {
+    const data = connection.map((user) => {
       return user.fromUserId._id.equals(loggedInUser) ? user.toUserId : user.fromUserId;
     })
-    res.json({
-      messaage: "All accepted connection request fetch successfully",
-      connection,
-    })
+    return sendResponse(
+      res,
+      200,
+      "All accepted connection request fetch successfully",
+      data
+    );
   } catch (error) {
-    res.status(500).send({
-      message: "Something went wrong",
-      error: error.message
-    })
+    return sendError(
+      res,
+      500,
+      "Something went wrong while fetching connection requests"
+    );
+  }
+})
+
+userRouter.get("/user/request/rejectedUser", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user._id
+    const requests = await ConnectionRequest.find({
+      toUserId: loggedInUser, status: "rejected"
+    }).populate("fromUserId", ["firstName", "lastName", "photoUrl"])
+
+    const data = requests.map((request) => ({
+      requestId: request._id,
+      status: request.status,
+      createdAt: request.createdAt || request.updatedAt || "",
+      user: request.fromUserId,
+    }));
+
+    return sendResponse(
+      res,
+      200,
+      "Rejected users fetched successfully",
+      data
+    );
+  } catch (error) {
+    console.error("Error fetching connection requests:", error);
+
+    return sendError(
+      res,
+      500,
+      "Something went wrong while fetching connection requests"
+    );
+
   }
 })
 
@@ -131,7 +168,6 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = Math.min(Number(req.query.limit) || 10, 50);
     const skip = (page - 1) * limit
-    console.log(page, limit, skip)
     const loggedInUser = req.user._id;
     const connection = await ConnectionRequest.find({
       $or: [
@@ -146,19 +182,23 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
     })
     const profileFeed = await User.find({
       _id: { $nin: Array.from(hideUser) }
-    }).select("firstName lastName gender age about skills photoUrl")
+    }).select("firstName lastName age gender about skills photoUrl location githubUrl linkedinUrl")
       .skip(skip)
       .limit(limit)
 
-    return res.status(200).json({
-      message: "Profile feed fetched successfully",
-      data: profileFeed
-    });
+
+    return sendResponse(
+      res,
+      200,
+      "Profile feed fetched successfully",
+      profileFeed
+    );
   } catch (error) {
-    res.status(500).send({
-      message: "Something went wrong",
-      error: error.message
-    })
+    return sendError(
+      res,
+      500,
+      "Something went wrong while fetching connection requests"
+    );
   }
 })
 

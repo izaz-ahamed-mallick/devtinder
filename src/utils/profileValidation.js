@@ -1,5 +1,5 @@
 const validationProfileEdit = (req) => {
-  const ALLOWED_EDIT_FIELD = ["firstName", "lastName", "age", "gender", "about", "skills"]
+  const ALLOWED_EDIT_FIELD = ["firstName", "lastName", "gender", "skills", "age", "githubUrl", "linkedinUrl", "photoUrl", "location","about","portfolioUrl"]
   const isNotAllowed = Object.keys(req.body).filter(key => !ALLOWED_EDIT_FIELD.includes(key))
   if (isNotAllowed.length > 0) {
     throw new Error(

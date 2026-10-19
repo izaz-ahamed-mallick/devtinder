@@ -64,16 +64,41 @@ const userSchema = new mongoose.Schema({
 
   photoUrl: {
     type: String
-  }
+  },
+  location: {
+    city: {
+      type: String,
+      trim: true,
+      default: "",
+      maxLength: 100,
+    },
+    state: {
+      type: String,
+      trim: true,
+      default: "",
+      maxLength: 100,
+    },
+    country: {
+      type: String,
+      trim: true,
+      default: "India",
+      maxLength: 100,
+    },
+  },
 
 }, { timestamps: true })
 
 userSchema.methods.getJWT = async function () {
   const user = this;
-  const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET)
-  return token;
 
-}
+  const token = jwt.sign(
+    { id: user._id },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
+
+  return token;
+};
 
 userSchema.methods.validatiorPassword = async function (paswordByUserInput) {
   const user = this;

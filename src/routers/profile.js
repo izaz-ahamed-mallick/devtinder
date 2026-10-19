@@ -23,15 +23,16 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
 })
 
 
-profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
+profileRouter.patch("/profile/update", userAuth, async (req, res) => {
   try {
     validationProfileEdit(req)
     const loggedInUser = req.user;
+    console.log(req.body)
     Object.assign(loggedInUser, req.body)
     await loggedInUser.save()
     const { password: _, ...userData } = loggedInUser.toObject()
     res.status(200).json({
-      message: "Profile updated successfully",
+      message: "Profile updated successfully done!",
       data: userData
     });
   } catch (error) {
@@ -42,7 +43,7 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   }
 })
 
-profileRouter.patch("/profile/updatePassword",userAuth,updatePasswordValidation, async (req, res) => {
+profileRouter.patch("/profile/updatePassword", userAuth, updatePasswordValidation, async (req, res) => {
   try {
     const userId = req.user._id;
     const user = await User.findOne({ _id: userId })
@@ -54,7 +55,7 @@ profileRouter.patch("/profile/updatePassword",userAuth,updatePasswordValidation,
     const hashNewPassword = await bcrypt.hash(newPassword, 10)
     user.password = hashNewPassword;
     await user.save()
-res.send({message:"Password update successfull!!"})
+    res.send({ message: "Password update successfully done!!" })
   } catch (error) {
     res.status(400).send({
       message: "Error updating the data",
