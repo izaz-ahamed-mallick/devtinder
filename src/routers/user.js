@@ -186,7 +186,7 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
       .skip(skip)
       .limit(limit)
 
-
+console.log(connection)
     return sendResponse(
       res,
       200,
