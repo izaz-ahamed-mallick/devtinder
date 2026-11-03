@@ -13,10 +13,11 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-     "start": "node src/app.js",
+    "start": "node src/app.js",
     "dev": "nodemon src/app.js"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.1158.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
