@@ -2,6 +2,7 @@ const express = require("express");
 const { signUpValidation, loginValidation } = require("../utils/validation");
 const { signUpController, loginController } = require("../controller/auth.controller");
 const { verifyEmailController } = require("../controller/verifyEmailController");
+const { resendVerificationController } = require("../controller/resendVerificationController");
 const authRouter = express.Router();
 
 authRouter.post('/signup', signUpValidation, signUpController)
@@ -16,4 +17,6 @@ authRouter.post("/logout", async (req, res) => {
   });
 });
 authRouter.post("/verify-email", verifyEmailController);
+
+authRouter.post("/resend-verification",resendVerificationController)
 module.exports = authRouter
