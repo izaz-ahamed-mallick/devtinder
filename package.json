@@ -1,7 +1,7 @@
 {
-  "name": "devtinder-backend",
+  "name": "devcircle-backend",
   "version": "1.0.0",
-  "description": "This is devtinder backend",
+  "description": "This is DevCircle backend",
   "keywords": [
     "JavaScript",
     "Node",
@@ -23,6 +23,7 @@
     "cors": "^2.8.6",
     "dotenv": "^18.0.4",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.7.3",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.10.0",
     "validator": "^13.15.35"

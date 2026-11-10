@@ -110,6 +110,8 @@ const loginController = async (req, res) => {
     const user = await loginService(emailId, password)
     if (!user.isEmailVerified) {
       return res.status(403).json({
+        success: false,
+        code: "EMAIL_NOT_VERIFIED",
         message: "Please verify your email before logging in.",
       });
     }

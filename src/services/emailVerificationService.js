@@ -15,7 +15,7 @@ const sendVerificationEmail = async (email, firstName, token) => {
 
   await sendEmail({
     to: getEmailRecipient(email),
-    subject: "Verify your DevTinder email",
+    subject: "Verify your DevCircle email",
     text: `Hi ${firstName}, verify your email here: ${verificationLink}`,
     html,
   });
@@ -26,8 +26,8 @@ const sendWelcomeEmail = async (email, firstName) => {
 
   await sendEmail({
     to: getEmailRecipient(email),
-    subject: "Welcome to DevTinder!",
-    text: `Hi ${firstName}, your email has been verified successfully. Welcome to DevTinder!`,
+    subject: "Welcome to DevCircle!",
+    text: `Hi ${firstName}, your email has been verified successfully. Welcome to DevCircle!`,
     html,
   });
 };

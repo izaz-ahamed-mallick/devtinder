@@ -5,6 +5,7 @@ const { sendWelcomeEmail } = require("../services/emailVerificationService");
 
 
 const verifyEmailController = async (req, res) => {
+  console.log("Called")
   try {
     const { token } = req.body;
 
@@ -46,7 +47,7 @@ const verifyEmailController = async (req, res) => {
     }
 
     return res.status(200).json({
-      message: "Email verified successfully! Welcome to DevTinder.",
+      message: "Email verified successfully! Welcome to DevCircle.",
     });
 
   } catch (error) {

@@ -5,18 +5,18 @@ const verifyEmailTemplate = ({ firstName, verificationLink }) => {
     <html>
       <head>
         <meta charset="UTF-8">
-        <title>Verify your DevTinder email</title>
+        <title>Verify your DevCircle email</title>
       </head>
 
       <body style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
 
-        <h2>Welcome to DevTinder!</h2>
+        <h2>Welcome to DevCircle!</h2>
 
         <p>Hi ${firstName},</p>
 
         <p>
           Thanks for signing up. Please verify your email address
-          to activate your DevTinder account.
+          to activate your DevCircle account.
         </p>
 
         <a href="${verificationLink}"
@@ -30,7 +30,7 @@ const verifyEmailTemplate = ({ firstName, verificationLink }) => {
 
         <p>If you didn't create this account, please ignore this email.</p>
 
-        <p>Thanks,<br>DevTinder Team</p>
+        <p>Thanks,<br>DevCircle Team</p>
 
       </body>
     </html>

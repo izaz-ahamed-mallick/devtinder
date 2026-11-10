@@ -99,6 +99,29 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  resetPasswordOTPHash: {
+    type: String,
+    default: null,
+  },
+
+  resetPasswordOTPExpires: {
+    type: Date,
+    default: null,
+  },
+
+  resetPasswordVerified: {
+    type: Boolean,
+    default: false,
+  },
+  resetPasswordTokenHash: {
+    type: String,
+    default: null,
+  },
+
+  resetPasswordTokenExpires: {
+    type: Date,
+    default: null,
+  },
 
 }, { timestamps: true })
 
